@@ -26,11 +26,24 @@ function renderCafe(doc) {
 
 
 // How to get data from Firestore(getting data)
-db.collection('cafes').get().then((snapshot) => {
-    // console.log(snapshot.docs);
-    snapshot.docs.forEach(element => {
-        // console.log(element.data());
-        renderCafe(element);
+// db.collection('cafes').get().then((snapshot) => {
+//     // console.log(snapshot.docs);
+//     snapshot.docs.forEach(element => {
+//         // console.log(element.data());
+//         renderCafe(element);
+//     });
+// })
+
+//real-time listener (getting data)
+db.collection('cafes').orderBy('city').onSnapshot(snapshot => {
+    let changes = snapshot.docChanges();
+    changes.forEach(change => {
+        if(change.type == 'added') {
+            renderCafe(change.doc);
+        } else if(change.type == 'removed') {
+            let li = cafeList.querySelector('[data-id='+change.doc.id+']');
+            cafeList.removeChild(li);
+        }
     });
 })
 
